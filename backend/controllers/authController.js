@@ -1,6 +1,7 @@
 import React from "react";
 import User from "../models/authmodel.js";
 import bcrypt from "bcryptjs";
+import generateTokenAndSetCookies from "../utils/generatedToken.js";
 
 // Signup functionality
 export const signup = async (req, res) => {
@@ -61,7 +62,7 @@ export const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Wrong password!" });
     }
-
+    generateTokenAndSetCookies(user._id , res);
     // Send user data in response
     const { _id, fullName, profilePic } = user;
     res.status(200).json({
@@ -70,6 +71,7 @@ export const login = async (req, res) => {
       username,
       profilePic,
     });
+
   } catch (error) {
     console.error(error);
     res
