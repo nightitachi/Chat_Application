@@ -1,18 +1,64 @@
-import React from 'react'
-// signup functionality
-export const signup = async(res, res)=>{
-  res.status(200).json("works as well ")
-  
-}
+import React from 'react';
+import User from '../models/authmodel.js';
+import bcrypt from 'bcryptjs';
 
+// Signup functionality
+export const signup = async (req, res) => {
+  try {
+    const { fullName, username, password, ConfirmedPassword, gender } = req.body;
 
-//login functionality
-export const login = async(res, res)=>{
-  res.status(200).json("wroks as well")
-}
+    if (password.length < 6) {
+      return res.status(400).json("Password must be more than 6 characters");
+    }
 
+    if (ConfirmedPassword !== password) {
+      return res.status(400).json("Passwords do not match!");
+    }
 
-// logout functionality
-export const logout= async(res, res)=>{
-  res.status(200).json("wroks as well")
-}
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json("User already exists!");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      fullName,
+      username,
+      password: hashedPassword,
+      gender,
+      profilePic: "", // Provide a default or optional value
+    });
+
+    await newUser.save();
+    res.status(201).json({
+      fullName,
+      username,
+      password: hashedPassword,
+      gender,
+      profilePic: "",
+    });
+  } catch (error) {
+    console.error("Signup error:", error); 
+    res.status(500).json("Internal server error");
+  }
+};
+
+// Login functionality
+export const login = async (req, res) => {
+  try {
+    const {username , password } = req.body;
+    
+    const user = await User.findOne({username})
+    const ispasswordCorrect = bcrypt.compare(password)
+
+  } catch (error) {
+    console.error("Signup error:", error); 
+    res.status(500).json("Internal server error");
+  }
+};
+
+// Logout functionality
+export const logout = async (req, res) => {
+  res.status(200).json("Logout works as well");
+};
