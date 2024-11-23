@@ -42,7 +42,7 @@ export const signup = async (req, res) => {
     });
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json("Internal server error");
+    res.status(500).json({message : "Internal server error"});
   }
 };
 
@@ -81,6 +81,12 @@ export const login = async (req, res) => {
 };
 
 // Logout functionality
-export const logout = async (req, res) => {
-  res.status(200).json("Logout works as well");
+export const logout = async(req, res) => {
+  try {
+    res.cookie("jwt" ,"",{maxAge:0} )
+    res.status(200).json({message:"logged out successfully ! "})
+  } catch (error) {
+    console.error('Error during login:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
